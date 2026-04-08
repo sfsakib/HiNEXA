@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beginner Guide</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#f7f8ff;
+  display:flex;
+  justify-content:center;
+}
+
+.app{
+  width:100%;
+  max-width:415px;
+  background:#f2f3f7;
+}
+
+/* HEADER */
+.header{
+  background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+  border-bottom:1px solid #ddd;
+  color:#fff;
+  position:relative; /* 👈 add this */
+}
+
+.back{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:18px;
+  color:#fff;
+}
+
+
+/* TEXT BOX */
+.text-box{
+  background:#fff;
+  margin:10px;
+  padding:12px;
+  border-radius:10px;
+  font-size:13px;
+  line-height:1.6;
+}
+
+/* IMAGE BOX */
+.img-box{
+  margin:10px;
+}
+
+.img-box img{
+  width:100%;
+  border-radius:10px;
+  display:block;
+}
+
+/* NAVBAR */
+.bottom-nav{
+  position:fixed;
+  bottom:0; 
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:415px;
+  background:rgba(255,255,255,0.9); /* 👈 slight premium */
+  backdrop-filter:blur(8px);        /* 👈 glass effect */
+  border-radius:10px;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.nav-item{
+  text-align:center;
+  font-size:11px;
+  color:#777;
+  position:relative;              /* 👈 add */
+  transition:0.3s;                /* 👈 smooth */
+}
+
+.nav-item i{
+  font-size:18px;
+  margin-bottom:3px;
+  transition:0.3s;                /* 👈 add */
+}
+
+.nav-item.active{
+  color:#ff5b5b;
+}
+
+/* 🔥 small premium effect */
+.nav-item.active i{
+  transform:translateY(-4px);
+}
+
+.nav-item{
+  text-align:center;
+  font-size:11px;
+  color:#777;
+  position:relative;
+  transition:0.3s;
+  text-decoration:none;   /* 🔥 underline remove */
+}
+
+.nav-item p{
+  margin:0;
+}
+
+.nav-item i{
+  font-size:18px;
+  margin-bottom:3px;
+  transition:0.3s;
+}
+
+.nav-item.active{
+  color:#ff5b5b;
+}
+
+.nav-item.active i{
+  transform:translateY(-4px);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+    <div class="header">
+    <i class="fas fa-arrow-left back" onclick="history.back()"></i>
+    Beginner Guide
+  </div>
+
+  <!-- 🔴 TEXT SECTION -->
+  <div class="text-box">
+    1. How to Register<br>
+      -Fill Your Phone Number<br>
+      -Set Your Own Password (6 letters)<br>
+      -Fill Your invite Code (Optional)<br>
+      -Click Register<br>
+  </div>
+
+  <!-- ✅ IMAGE -->
+  <div class="img-box">
+    <img src="register.png">
+  </div>
+
+  <!-- 🔴 TEXT -->
+  <div class="text-box">
+    2. How to Deposit<br>
+    -<br>
+    -<br>
+    -<br>
+    -<br>
+  </div>
+
+  <!-- ✅ IMAGE -->
+  <div class="img-box">
+    <img src="deposit1.png">
+    <img src="deposit2.png">
+    <img src="deposit3.png">
+  </div>
+
+  <!-- 🔴 TEXT -->
+  <div class="text-box">
+    2. How to Withdraw<br>
+    -<br>
+    -<br>
+    -<br>
+    -<br>
+  </div>
+
+  <!-- ✅ IMAGE -->
+  <div class="img-box">
+    <img src="withdraw1.png">
+    <img src="withdraw2.png">
+  </div>
+
+</div>
+
+<!-- NAVBAR -->
+<div class="bottom-nav">
+
+  <a href="home.html" class="nav-item">
+    <i class="fas fa-home"></i>
+    <p>Home</p>
+  </a>
+
+  <a href="activity.html" class="nav-item">
+    <i class="fas fa-chart-line"></i>
+    <p>Activity</p>
+  </a>
+
+  <a href="referral.html" class="nav-item">
+    <i class="fas fa-download"></i>
+    <p>Referral</p>
+  </a>
+
+  <a href="wallet.html" class="nav-item">
+    <i class="fas fa-wallet"></i>
+    <p>Wallet</p>
+  </a>
+
+  <a href="account.html" class="nav-item active">
+    <i class="fas fa-user"></i>
+    <p>Account</p>
+  </a>
+
+</div>
+
+</body>
+</html>

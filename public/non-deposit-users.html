@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Non Deposit Users</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#f5f7fb;
+    }
+
+    .container{
+      padding:20px;
+    }
+
+    h2{
+      margin-bottom:15px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    thead{
+      background:linear-gradient(45deg,#ef4444,#dc2626);
+      color:#fff;
+    }
+
+    th, td{
+      padding:12px;
+      text-align:left;
+      border-bottom:1px solid #eee;
+      font-size:14px;
+    }
+
+    tbody tr:hover{
+      background:#fff1f2;
+    }
+
+    .balance{
+      font-weight:bold;
+      color:#2196f3;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Non Deposit Users</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Phone</th>
+        <th>Last Login</th>
+        <th>Balance</th>
+      </tr>
+    </thead>
+
+    <tbody id="users"></tbody>
+  </table>
+
+</div>
+
+<script>
+async function loadUsers(){
+  const res = await fetch("/api/admin/non-deposit-users");
+  const data = await res.json();
+
+  let html = "";
+
+  if(data.length === 0){
+    html = "<tr><td colspan='4'>No Non Deposit Users</td></tr>";
+  } else {
+    data.forEach(user => {
+      html += `
+        <tr>
+          <td>${user.name || "No Name"}</td>
+          <td>${user.phone || "-"}</td>
+          <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "-"}</td>
+          <td class="balance">৳${user.balance || 0}</td>
+        </tr>
+      `;
+    });
+  }
+
+  document.getElementById("users").innerHTML = html;
+}
+
+loadUsers();
+</script>
+
+</body>
+</html>

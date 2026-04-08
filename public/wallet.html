@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="wallet-header">
+
+    <div class="top-row">
+      <a href="home.html">←</a>
+      <h2>Wallet</h2>
+      <div></div>
+    </div>
+
+    <div class="wallet-info">
+      <i class="fas fa-wallet"></i>
+      <h2 id="totalBalance">৳0.00</h2>
+      <p>Total balance</p>
+
+      <div class="wallet-stats">
+        <div>
+          <span id="totalAmount">৳0.00</span>
+          <p>Total Withdraw</p>
+        </div>
+        <div>
+          <span id="totalDeposit">৳0.00</span>
+          <p>Total Deposit</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <!-- BOX -->
+  <div class="wallet-box">
+
+    <div class="wallet-circles">
+
+  <div class="circle gray" id="mainWallet">
+   <span id="mainPercent">100%</span>
+  </div>
+
+  <div class="circle gray" id="thirdWallet">
+   <span id="thirdPercent">0%</span>
+  </div>
+
+</div>
+
+    <div class="wallet-labels">
+  <div>
+    <h3 id="mainBalance">৳0.00</h3>
+    <p>Main wallet</p>
+  </div>
+  <div>
+    <h3 id="thirdBalance">৳0.00</h3> <!-- ✅ FIX -->
+    <p>Partner rewards</p>
+  </div>
+</div>
+
+    <button class="transfer-btn" onclick="transfer()">Main wallet transfer</button>
+
+  </div>
+
+  <div class="wallet-actions">
+
+  <a href="deposit.html" class="action">
+    <div class="icon-box"><i class="fas fa-download"></i></div>
+    <p>Deposit</p>
+  </a>
+
+  <a href="withdraw.html" class="action">
+    <div class="icon-box"><i class="fas fa-upload"></i></div>
+    <p>Withdraw</p>
+  </a>
+
+  <a href="deposit-history.html" class="action">
+    <div class="icon-box"><i class="fas fa-file-alt"></i></div>
+    <p>Deposit history</p>
+  </a>
+
+  <a href="withdraw-history.html" class="action">
+    <div class="icon-box"><i class="fas fa-wallet"></i></div>
+    <p>Withdrawal history</p>
+  </a>
+
+</div>
+
+</div>
+
+<!-- NAVBAR -->
+<div class="bottom-nav">
+
+  <a href="home.html" class="nav-item">
+    <i class="fas fa-home"></i>
+    <p>Home</p>
+  </a>
+
+  <a href="activity.html" class="nav-item">
+    <i class="fas fa-chart-line"></i>
+    <p>Activity</p>
+  </a>
+
+  <a href="referral.html" class="nav-item">
+    <i class="fas fa-download"></i>
+    <p>Referral</p>
+  </a>
+
+  <a href="wallet.html" class="nav-item active">
+    <i class="fas fa-wallet"></i>
+    <p>Wallet</p>
+  </a>
+
+  <a href="account.html" class="nav-item">
+    <i class="fas fa-user"></i>
+    <p>Account</p>
+  </a>
+
+</div>
+
+
+<script>
+const user = JSON.parse(localStorage.getItem("user"));
+
+async function loadWallet(){
+
+  const res = await fetch(`http://localhost:5000/api/wallet/${user._id}`);
+  const data = await res.json();
+
+  document.getElementById("totalBalance").innerText = "৳" + data.balance.toFixed(2);
+  document.getElementById("totalAmount").innerText = data.totalWithdraw;
+  document.getElementById("totalDeposit").innerText = data.totalDeposit;
+
+  document.getElementById("mainBalance").innerText = "৳" + data.mainWallet.toFixed(2);
+  document.getElementById("thirdBalance").innerText = "৳" + data.thirdWallet.toFixed(2);
+
+  const total = data.mainWallet + data.thirdWallet;
+
+  let mainPercent = total ? (data.mainWallet / total * 100) : 0;
+  let thirdPercent = total ? (data.thirdWallet / total * 100) : 0;
+
+  document.getElementById("mainPercent").innerText = Math.round(mainPercent) + "%";
+  document.getElementById("thirdPercent").innerText = Math.round(thirdPercent) + "%";
+}
+
+loadWallet();
+</script>
+
+</body>
+</html>

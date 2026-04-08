@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Chart JS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    .card-link{
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+  <h2>HiGNICE</h2>
+
+  <a href="admin.html" class="menu-title">Dashboard</a>
+
+  <div class="menu">
+    <div class="menu-title">
+      <span>Manage Games</span>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="submenu">
+      <a href="#">Popular</a>
+      <a href="#">Lottery</a>
+      <a href="#">Slots</a>
+      <a href="#">Sports</a>
+      <a href="#">Casino</a>
+      <a href="#">Rummy</a>
+      <a href="#">Fishing</a>
+      <a href="#">Original</a>
+    </div>
+  </div>
+
+  <div class="menu">
+    <div class="menu-title">
+      <span>Manage Users</span>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="submenu">
+      <a href="users.html">All Users</a>
+      <a href="active-users.html">Active Users</a>
+      <a href="banned-users.html">Banned Users</a>
+      <a href="deposit-users.html">Deposit User</a>
+      <a href="non-deposit-users.html">Non Deposit User</a>
+      <a href="send-notification.html">Send Notification</a>
+    </div>
+  </div>
+
+  <div class="menu">
+    <div class="menu-title">
+      <span>VIP Requests</span>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="submenu">
+      <a href="request-list.html">Request List</a>
+    </div>
+  </div>
+
+  <a href="admin-support.html">Support Ticket</a>
+  <a href="admin-feedback.html">User Feedback</a>
+</div>
+
+</div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h2>Dashboard</h2>
+
+    <!-- STATS -->
+    <div class="cards">
+
+      <a href="users.html" class="card-link">
+        <div class="card purple">
+          <h3 id="totalUsers">0</h3>
+          <p>Total Users</p>
+        </div>
+      </a>
+
+      <a href="active-users.html" class="card-link">
+        <div class="card green">
+          <h3 id="activeUsers">0</h3>
+          <p>Active Users</p>
+        </div>
+      </a>
+
+      <a href="deposits.html" class="card-link">
+        <div class="card red">
+          <h3 id="totalDeposited">0</h3>
+          <p>Total Deposited</p>
+        </div>
+      </a>
+
+      <a href="withdraws.html" class="card-link">
+        <div class="card blue">
+          <h3 id="totalWithdrawn">0</h3>
+          <p>Total Withdrawn</p>
+        </div>
+      </a>
+
+      <a href="pending-deposits.html" class="card-link">
+        <div class="card red">
+          <h3 id="pendingDeposits">0</h3>
+          <p>Pending Deposits</p>
+        </div>
+      </a>
+
+      <a href="pending-withdrawals.html" class="card-link">
+        <div class="card blue">
+          <h3 id="pendingWithdrawals">0</h3>
+          <p>Pending Withdrawals</p>
+        </div>
+      </a>
+
+      <a href="rejected-deposits.html" class="card-link">
+        <div class="card red">
+          <h3 id="rejectedDeposits">0</h3>
+          <p>Rejected Deposits</p>
+        </div>
+      </a>
+
+      <a href="rejected-withdrawals.html" class="card-link">
+        <div class="card blue">
+          <h3 id="rejectedWithdrawals">0</h3>
+          <p>Rejected Withdrawals</p>
+        </div>
+      </a>
+
+      <a href="#" class="card-link">
+        <div class="card blue">
+          <h3 id="totalPlayed">0</h3>
+          <p>Total Played</p>
+        </div>
+      </a>
+
+      <a href="#" class="card-link">
+        <div class="card blue">
+          <h3 id="totalWin">0</h3>
+          <p>Total Win</p>
+        </div>
+      </a>
+
+      <a href="#" class="card-link">
+        <div class="card red">
+          <h3 id="totalLoss">0</h3>
+          <p>Total Loss</p>
+        </div>
+      </a>
+
+      <a href="#" class="card-link">
+        <div class="card blue">
+          <h3 id="totalProfit">0</h3>
+          <p>Total Profit</p>
+        </div>
+      </a>
+
+      <a href="deposit-users.html" class="card-link">
+        <div class="card blue">
+          <h3 id="deposituser">0</h3>
+          <p>Deposit User</p>
+        </div>
+      </a>
+
+      <a href="non-deposit-users.html" class="card-link">
+        <div class="card red">
+          <h3 id="nondeposituser">0</h3>
+          <p>Non Deposit User</p>
+        </div>
+      </a>
+
+      <a href="banned-users.html" class="card-link">
+        <div class="card red">
+          <h3 id="bannedUsers">0</h3>
+          <p>Banned Users</p>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts">
+      <canvas id="chart1"></canvas>
+      <canvas id="chart2"></canvas>
+      <canvas id="chart3"></canvas>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+let chart;
+
+async function loadChart(){
+  const res = await fetch("/api/admin/chart");
+  const data = await res.json();
+
+  const ctx = document.getElementById("chart1");
+
+  if(chart){
+    chart.destroy();
+  }
+
+  chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: "Deposits",
+          data: data.deposits,
+          backgroundColor: "#22c55e"
+        },
+        {
+          label: "Withdrawals",
+          data: data.withdrawals,
+          backgroundColor: "#ef4444"
+        }
+      ]
+    }
+  });
+}
+
+async function loadStats(){
+  try {
+    const res = await fetch("/api/admin/stats");
+    const data = await res.json();
+
+    document.getElementById("totalUsers").innerText = data.totalUsers || 0;
+    document.getElementById("activeUsers").innerText = data.activeUsers || 0;
+
+    document.getElementById("bannedUsers").innerText = data.bannedUsers || 0;
+
+    document.getElementById("deposituser").innerText = data.deposituser || 0;
+    document.getElementById("nondeposituser").innerText = data.nondeposituser || 0;
+
+    document.getElementById("totalDeposited").innerText = "৳" + (data.totalDeposited || 0).toFixed(2);
+    document.getElementById("pendingDeposits").innerText = data.pendingDeposits || 0;
+    document.getElementById("rejectedDeposits").innerText = data.rejectedDeposits || 0;
+
+    document.getElementById("totalWithdrawn").innerText = "৳" + (data.totalWithdrawn || 0).toFixed(2);
+    document.getElementById("pendingWithdrawals").innerText = data.pendingWithdrawals || 0;
+    document.getElementById("rejectedWithdrawals").innerText = data.rejectedWithdrawals || 0;
+
+    document.getElementById("totalPlayed").innerText = "৳" + (data.totalPlayed || 0).toFixed(2);
+    document.getElementById("totalWin").innerText = "৳" + (data.totalWin || 0).toFixed(2);
+    document.getElementById("totalLoss").innerText = "৳" + (data.totalLoss || 0).toFixed(2);
+    document.getElementById("totalProfit").innerText = "৳" + (data.totalProfit || 0).toFixed(2);
+
+  } catch (err) {
+    console.error("Stats error:", err);
+  }
+}
+
+// INITIAL LOAD
+loadStats();
+loadChart();
+
+// AUTO REFRESH
+setInterval(() => {
+  loadStats();
+  loadChart();
+}, 5000);
+</script>
+
+
+<script>
+document.querySelectorAll(".menu-title").forEach(menu => {
+  menu.addEventListener("click", () => {
+    menu.parentElement.classList.toggle("open");
+  });
+});
+</script>
+
+</body>
+</html>

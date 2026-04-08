@@ -1,0 +1,361 @@
+<!DOCTYPE html> 
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#f7f8ff;
+  display:flex;
+  justify-content:center;
+}
+
+.app{
+  width:100%;
+  max-width:415px;
+  min-height:100vh;
+  background:#f2f3f7;
+  padding-bottom:90px;
+}
+
+/* HEADER */
+.header{
+  background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+  color:#fff;
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+  position:relative;
+}
+
+.back{
+  position:absolute;
+  left:15px;
+  top:15px;
+}
+
+/* CARD */
+.card{
+  background:#fff;
+  margin:15px;
+  border-radius:15px;
+  padding:15px;
+}
+
+/* ROW */
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid #eee;
+  cursor:pointer;
+}
+
+.row:last-child{
+  border:none;
+}
+
+.left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.icon{
+  width:35px;
+  height:35px;
+  background:#ffe5e5;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#ff5b5b;
+}
+
+.avatar{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.title{font-size:14px;}
+.value{color:#555;}
+
+/* NAVBAR */
+.bottom-nav{
+  position:fixed;
+  bottom:0; 
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:415px;
+  background:rgba(255,255,255,0.9); /* 👈 slight premium */
+  backdrop-filter:blur(8px);        /* 👈 glass effect */
+  border-radius:10px;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.nav-item{
+  text-align:center;
+  font-size:11px;
+  color:#777;
+  position:relative;              /* 👈 add */
+  transition:0.3s;                /* 👈 smooth */
+}
+
+.nav-item i{
+  font-size:18px;
+  margin-bottom:3px;
+  transition:0.3s;                /* 👈 add */
+}
+
+.nav-item.active{
+  color:#ff5b5b;
+}
+
+/* 🔥 small premium effect */
+.nav-item.active i{
+  transform:translateY(-4px);
+}
+
+.nav-item{
+  text-align:center;
+  font-size:11px;
+  color:#777;
+  position:relative;
+  transition:0.3s;
+  text-decoration:none;   /* 🔥 underline remove */
+}
+
+.nav-item p{
+  margin:0;
+}
+
+.nav-item i{
+  font-size:18px;
+  margin-bottom:3px;
+  transition:0.3s;
+}
+
+.nav-item.active{
+  color:#ff5b5b;
+}
+
+.nav-item.active i{
+  transform:translateY(-4px);
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <i class="fas fa-arrow-left back" onclick="history.back()"></i>
+    Settings Center
+  </div>
+
+  <!-- PROFILE -->
+  <div class="card">
+
+    <div class="row" onclick="openAvatar()">
+      <div class="left">
+        <img id="avatar" src="avata1.webp" class="avatar">
+      </div>
+      <div class="value">Change avatar <i class="fas fa-chevron-right"></i></div>
+    </div>
+
+    <div class="row" onclick="changeName()">
+      <div class="title">Nickname</div>
+      <div class="value" id="name">Loading...</div>
+    </div>
+
+    <div class="row">
+      <div class="title">UID</div>
+      <div class="value" id="uid">...</div>
+    </div>
+
+  </div>
+
+  <!-- SECURITY -->
+  <div style="margin:10px 15px;font-weight:bold;">Security information</div>
+
+  <div class="card">
+
+    <div class="row" onclick="openPasswordPage()">
+      <div class="left">
+        <div class="icon"><i class="fas fa-lock"></i></div>
+        Login password
+      </div>
+      <div>Edit <i class="fas fa-chevron-right"></i></div>
+    </div>
+
+    <div class="row">
+      <div class="left">
+        <div class="icon"><i class="fas fa-phone"></i></div>
+        Phone
+      </div>
+      <div class="value" id="phone">Loading...</div>
+    </div>
+
+    <div class="row">
+      <div class="left">
+        <div class="icon"><i class="fas fa-info"></i></div>
+        Download Apps
+      </div>
+      <div>1.0.9</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- AVATAR MODAL -->
+<div id="avatarModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);">
+  <div style="background:#fff;margin:100px auto;padding:20px;border-radius:15px;width:300px;text-align:center;">
+    <h3>Select Avatar</h3>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <img src="avata1.webp" onclick="selectAvatar(this.src)">
+      <img src="avata2.webp" onclick="selectAvatar(this.src)">
+      <img src="avata3.webp" onclick="selectAvatar(this.src)">
+      <img src="avata4.webp" onclick="selectAvatar(this.src)">
+      <img src="avata5.webp" onclick="selectAvatar(this.src)">
+      <img src="avata6.webp" onclick="selectAvatar(this.src)">
+      <img src="avata7.webp" onclick="selectAvatar(this.src)">
+      <img src="avata8.webp" onclick="selectAvatar(this.src)">
+      <img src="avata9.webp" onclick="selectAvatar(this.src)">
+    </div>
+
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<div class="bottom-nav">
+
+  <a href="home.html" class="nav-item">
+    <i class="fas fa-home"></i>
+    <p>Home</p>
+  </a>
+
+  <a href="activity.html" class="nav-item">
+    <i class="fas fa-chart-line"></i>
+    <p>Activity</p>
+  </a>
+
+  <a href="referral.html" class="nav-item">
+    <i class="fas fa-download"></i>
+    <p>Referral</p>
+  </a>
+
+  <a href="wallet.html" class="nav-item">
+    <i class="fas fa-wallet"></i>
+    <p>Wallet</p>
+  </a>
+
+  <a href="account.html" class="nav-item active">
+    <i class="fas fa-user"></i>
+    <p>Account</p>
+  </a>
+
+</div>
+
+<script>
+const API = "https://unacoustical-dalia-unoppositional.ngrok-free.dev";
+const userId = localStorage.getItem("userId");
+
+// LOAD USER
+async function loadUser(){
+  try{
+    if(!userId){
+      alert("Login first");
+      return;
+    }
+
+    const res = await fetch(API + "/api/user/" + userId);
+    const data = await res.json();
+
+    document.getElementById("name").innerText = data.name || "No Name";
+    document.getElementById("phone").innerText = data.phone || "No Phone";
+    document.getElementById("uid").innerText = data._id.slice(-6);
+
+    if(data.avatar){
+      document.getElementById("avatar").src = data.avatar;
+    }
+
+  }catch(err){
+    console.error("Load user error:", err);
+  }
+}
+
+// AVATAR
+function openAvatar(){
+  document.getElementById("avatarModal").style.display="block";
+}
+
+async function selectAvatar(src){
+  try{
+    await fetch(API + "/api/user/avatar", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ userId, avatar: src })
+    });
+
+    document.getElementById("avatar").src = src;
+    document.getElementById("avatarModal").style.display="none";
+
+  }catch(err){
+    alert("Avatar update failed");
+  }
+}
+
+// NAME FIXED 🔥
+async function changeName(){
+  const name = prompt("Enter new name:");
+  if(!name) return;
+
+  try{
+    const res = await fetch(API + "/api/update-name", { // ✅ FIXED
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+  id: userId,   // 🔥 change this
+  name: name
+})
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+      document.getElementById("name").innerText = name;
+    }else{
+      alert("Failed to update name");
+    }
+
+  }catch(err){
+    alert("Server error");
+  }
+}
+
+// PASSWORD PAGE
+function openPasswordPage(){
+  window.location.href = "change-password.html";
+}
+
+loadUser();
+</script>
+
+</body>
+</html>

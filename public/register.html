@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="mobile-app">
+    <div class="top-header">
+      <div class="logo">HiGNICE</div>
+      <div class="page-title">Register</div>
+      <div class="sub-text">
+        Please register by phone number
+      </div>
+    </div>
+
+    <div class="form-area">
+      <div class="input-group">
+        <label class="input-label">Phone number</label>
+        <input class="input-box" id="phone" placeholder="Enter phone number" />
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Set password</label>
+        <input class="input-box" id="password" type="password" placeholder="Set password" />
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Invite code</label>
+        <input class="input-box" id="inviteCode" placeholder="Enter invite code (optional)" />
+      </div>
+
+      <div class="btn-wrap">
+        <button class="btn btn-primary" onclick="registerUser()">Register</button>
+      </div>
+
+      <div class="link-row">
+        I have an account <a href="login.html">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function registerUser() {
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const inviteCode = document.getElementById("inviteCode").value.trim();
+
+      if (!phone || !password) {
+        alert("Phone and password required");
+        return;
+      }
+
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ phone, password, inviteCode })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Register failed");
+        return;
+      }
+
+      alert("Registration successful");
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <script>
+  
+  // 🔥 add referral connection
+     if(referralCode){
+      const refUser = await User.findOne({ referralCode });
+
+     if(refUser){
+      refUser.referrals.push(user._id);
+     await refUser.save();
+  }
+}
+</script>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const ref = urlParams.get("ref");
+
+if(ref){
+  document.querySelector('input[placeholder="Enter invite code (optional)"]').value = ref;
+}
+</script>
+
+</body>
+</html>

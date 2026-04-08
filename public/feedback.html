@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#f7f8ff;
+  display:flex;
+  justify-content:center;
+}
+
+.app{
+  width:100%;
+  max-width:415px;
+  min-height:100vh;
+  background:#f2f3f7;
+  padding-bottom:90px;
+}
+
+/* HEADER */
+.header{
+  background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+  position:relative;
+  border-bottom:1px solid #eee;
+  color:#fff;
+}
+
+.back{
+  position:absolute;
+  left:15px;
+  top:15px;
+  font-size:18px;
+}
+
+/* TEXTAREA BOX */
+.box{
+  background:#fff;
+  margin:15px;
+  border-radius:15px;
+  padding:15px;
+  min-height:180px;
+  position:relative;
+}
+
+textarea{
+  width:100%;
+  height:120px;
+  border:none;
+  outline:none;
+  resize:none;
+  font-size:13px;
+  color:#666;
+}
+
+/* ICONS */
+.box-icons{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  display:flex;
+  gap:8px;
+}
+
+.icon-btn{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  background:#e6f7f4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#0bb;
+  font-size:16px;
+}
+
+/* TEXT CENTER */
+.text-center{
+  text-align:center;
+  margin-top:20px;
+}
+
+.text-center p{
+  margin:5px 0;
+}
+
+/* IMAGE */
+.img{
+  text-align:center;
+  margin-top:15px;
+}
+
+.img img{
+  width:180px;
+}
+
+/* BUTTON */
+.btn{
+  margin:20px 15px;
+  padding:14px;
+  background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+  border:none;
+  border-radius:30px;
+  color:#fff;
+  font-size:16px;
+  text-align:center;
+}
+
+/* NAVBAR */
+.bottom-nav{
+  position:fixed;
+  bottom:0; 
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:415px;
+  background:rgba(255,255,255,0.9); /* 👈 slight premium */
+  backdrop-filter:blur(8px);        /* 👈 glass effect */
+  border-radius:10px;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.nav-item{
+  text-align:center;
+  font-size:11px;
+  color:#777;
+  position:relative;              /* 👈 add */
+  transition:0.3s;                /* 👈 smooth */
+}
+
+.nav-item i{
+  font-size:18px;
+  margin-bottom:3px;
+  transition:0.3s;                /* 👈 add */
+}
+
+.nav-item.active{
+  color:#ff5b5b;
+}
+
+/* 🔥 small premium effect */
+.nav-item.active i{
+  transform:translateY(-4px);
+}
+
+.nav-item{
+  text-align:center;
+  font-size:11px;
+  color:#777;
+  position:relative;
+  transition:0.3s;
+  text-decoration:none;   /* 🔥 underline remove */
+}
+
+.nav-item p{
+  margin:0;
+}
+
+.nav-item i{
+  font-size:18px;
+  margin-bottom:3px;
+  transition:0.3s;
+}
+
+.nav-item.active{
+  color:#ff5b5b;
+}
+
+.nav-item.active i{
+  transform:translateY(-4px);
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <i class="fas fa-arrow-left back" onclick="history.back()"></i>
+    Feedback
+  </div>
+
+  <!-- TEXTAREA -->
+  <div class="box">
+    <textarea placeholder="Welcome to feedback, please describe your problem in detail. Attach screenshot if possible..."></textarea>
+
+    <div class="box-icons">
+      <div class="icon-btn"><i class="fas fa-image"></i></div>
+      <div class="icon-btn"><i class="fas fa-sync"></i></div>
+    </div>
+  </div>
+
+  <!-- TEXT -->
+  <div class="text-center">
+    <p>Send helpful feedback</p>
+    <p>Chance to win Mystery Rewards</p>
+  </div>
+
+  <!-- IMAGE -->
+  <div class="img">
+    <img src="feedback.webp">
+  </div>
+
+  <!-- BUTTON -->
+  <div class="btn" onclick="submitFeedback()">Submit</div>
+
+</div>
+
+<!-- NAVBAR -->
+<div class="bottom-nav">
+
+  <a href="home.html" class="nav-item">
+    <i class="fas fa-home"></i>
+    <p>Home</p>
+  </a>
+
+  <a href="activity.html" class="nav-item">
+    <i class="fas fa-chart-line"></i>
+    <p>Activity</p>
+  </a>
+
+  <a href="referral.html" class="nav-item">
+    <i class="fas fa-download"></i>
+    <p>Referral</p>
+  </a>
+
+  <a href="wallet.html" class="nav-item">
+    <i class="fas fa-wallet"></i>
+    <p>Wallet</p>
+  </a>
+
+  <a href="account.html" class="nav-item active">
+    <i class="fas fa-user"></i>
+    <p>Account</p>
+  </a>
+
+</div>
+
+<script>
+const userId = localStorage.getItem("userId") || "guest";
+
+// 🔘 Submit function
+async function submitFeedback(){
+  const message = document.querySelector("textarea").value.trim();
+
+  if(!message){
+    alert("Please write feedback first");
+    return;
+  }
+
+  try{
+    const res = await fetch("/api/feedback", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userId,
+        message
+      })
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+      alert("✅ Feedback submitted");
+      document.querySelector("textarea").value = "";
+    }else{
+      alert("❌ Failed to submit");
+    }
+
+  }catch(err){
+    alert("Server error ❌");
+  }
+}
+</script>
+
+</body>
+</html>

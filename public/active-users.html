@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Active Users</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#f5f7fb;
+    }
+
+    .container{
+      padding:20px;
+    }
+
+    h2{
+      margin-bottom:15px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    thead{
+      background:linear-gradient(45deg,#22c55e,#16a34a);
+      color:#fff;
+    }
+
+    th, td{
+      padding:12px;
+      text-align:left;
+      border-bottom:1px solid #eee;
+      font-size:14px;
+    }
+
+    tbody tr:hover{
+      background:#f0fff4;
+    }
+
+    .balance{
+      font-weight:bold;
+      color:#2196f3;
+    }
+
+    .btn{
+      padding:5px 10px;
+      border:1px solid #22c55e;
+      color:#22c55e;
+      border-radius:5px;
+      background:none;
+      cursor:pointer;
+    }
+
+    .btn:hover{
+      background:#22c55e;
+      color:#fff;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Active Users</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Phone</th>
+        <th>Last Login</th>
+        <th>Balance</th>
+      </tr>
+    </thead>
+
+    <tbody id="users"></tbody>
+  </table>
+
+</div>
+
+<script>
+async function loadUsers(){
+  const res = await fetch("/api/admin/active-users");
+  const data = await res.json();
+
+  let html = "";
+
+  data.forEach(user => {
+    html += `
+      <tr>
+        <td>${user.name || "No Name"}</td>
+        <td>${user.phone || "-"}</td>
+        <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "-"}</td>
+        <td class="balance">৳${user.balance || 0}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("users").innerHTML = html;
+}
+
+loadUsers();
+</script>
+
+</body>
+</html>

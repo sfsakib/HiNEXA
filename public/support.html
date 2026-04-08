@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Support</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#f7f8ff;
+    }
+
+    .wrap{
+      display:flex;
+      flex-direction:column;
+      height:100vh;
+      max-width:415px;
+      margin:auto;
+      background:#efeae2;
+      position:relative;
+    }
+
+    /* HEADER */
+    .top{
+      background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+      color:#fff;
+      padding:14px 16px;
+      font-size:18px;
+      position:sticky;
+      top:0;
+      z-index:10;
+      text-align:center;
+    }
+
+    /* MESSAGE AREA */
+    .messages{
+     flex:1;
+     overflow:auto;
+     padding:15px;
+     display:flex;
+     flex-direction:column;
+     gap:10px;
+
+     padding-bottom:140px; /* 🔥 important fix */
+    }
+
+    .msg{
+      max-width:70%;
+      padding:10px 12px;
+      border-radius:10px;
+    }
+
+    .me{
+      align-self:flex-end;
+      background:#d9fdd3;
+    }
+
+    .other{
+      align-self:flex-start;
+      background:#fff;
+    }
+
+    .msg img{
+      max-width:220px;
+      border-radius:8px;
+      display:block;
+    }
+
+    .time{
+      font-size:11px;
+      color:#666;
+      margin-top:6px;
+    }
+
+    /* INPUT AREA */
+    .bottom{
+     display:flex;
+     gap:8px;
+     padding:10px;
+     
+
+     position:fixed;
+     bottom:60px; /* navbar height */
+     left:50%;
+     transform:translateX(-50%);
+     width:100%;
+     max-width:390px;
+     z-index:1000;
+    }
+
+    .bottom input[type="text"]{
+      flex:1;
+      padding:12px;
+      border:none;
+      border-radius:8px;
+    }
+
+    .bottom button,.file-label{
+      padding:10px 12px;
+      border:none;
+      border-radius:8px;
+      background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+      color:#fff;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    .file-label{
+      display:flex;
+      align-items:center;
+    }
+
+    #file{
+      display:none;
+    }
+
+    /* 🔻 BOTTOM NAVBAR */
+    .bottom-nav{
+  position:fixed;
+  bottom:0; 
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:415px;
+  background:rgba(255,255,255,0.9); /* 👈 slight premium */
+  backdrop-filter:blur(8px);        /* 👈 glass effect */
+  border-radius:10px;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.nav-item{
+  text-align:center;
+  font-size:11px;
+  color:#777;
+  position:relative;              /* 👈 add */
+  transition:0.3s;                /* 👈 smooth */
+}
+
+.nav-item i{
+  font-size:18px;
+  margin-bottom:3px;
+  transition:0.3s;                /* 👈 add */
+}
+
+.nav-item.active{
+  color:#ff5b5b;
+}
+
+/* 🔥 small premium effect */
+.nav-item.active i{
+  transform:translateY(-4px);
+}
+
+.nav-item{
+  text-align:center;
+  font-size:11px;
+  color:#777;
+  position:relative;
+  transition:0.3s;
+  text-decoration:none;   /* 🔥 underline remove */
+}
+
+.nav-item p{
+  margin:0;
+}
+
+.nav-item i{
+  font-size:18px;
+  margin-bottom:3px;
+  transition:0.3s;
+}
+
+.nav-item.active{
+  color:#ff5b5b;
+}
+
+.nav-item.active i{
+  transform:translateY(-4px);
+}
+  </style>
+</head>
+
+<body>
+
+<div class="wrap">
+  <div class="top">Customer Support</div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="bottom">
+    <label class="file-label" for="file">Image</label>
+    <input type="file" id="file" accept="image/*">
+    <input type="text" id="msg" placeholder="Type message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<!-- 🔻 NAVBAR -->
+<div class="bottom-nav">
+
+  <a href="home.html" class="nav-item">
+    <i class="fas fa-home"></i>
+    <p>Home</p>
+  </a>
+
+  <a href="activity.html" class="nav-item">
+    <i class="fas fa-chart-line"></i>
+    <p>Activity</p>
+  </a>
+
+  <a href="referral.html" class="nav-item">
+    <i class="fas fa-download"></i>
+    <p>Referral</p>
+  </a>
+
+  <a href="wallet.html" class="nav-item">
+    <i class="fas fa-wallet"></i>
+    <p>Wallet</p>
+  </a>
+
+  <a href="account.html" class="nav-item active">
+    <i class="fas fa-user"></i>
+    <p>Account</p>
+  </a>
+
+</div>
+
+<script>
+const userId = localStorage.getItem("userId");
+
+if(!userId){
+  alert("Login first");
+  window.location.href = "login.html";
+}
+
+// LOAD CHAT
+async function loadHistory(){
+  const res = await fetch("/api/chat/" + userId);
+  const data = await res.json();
+
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
+
+  data.forEach(m => {
+    const div = document.createElement("div");
+    div.className = "msg " + (m.sender === "user" ? "me" : "other");
+
+    let html = "";
+    if(m.message) html += `<div>${m.message}</div>`;
+    if(m.image) html += `<img src="${m.image}">`;
+    html += `<div class="time">${new Date(m.createdAt).toLocaleString()}</div>`;
+
+    div.innerHTML = html;
+    box.appendChild(div);
+  });
+
+  box.scrollTop = box.scrollHeight;
+}
+
+// SEND MESSAGE
+async function sendMessage(){
+  const text = document.getElementById("msg").value.trim();
+  const fileInput = document.getElementById("file");
+  let image = "";
+
+  if(fileInput.files[0]){
+    const fd = new FormData();
+    fd.append("image", fileInput.files[0]);
+
+    const uploadRes = await fetch("/api/chat/upload", {
+      method: "POST",
+      body: fd
+    });
+    const uploadData = await uploadRes.json();
+    image = uploadData.image;
+  }
+
+  if(!text && !image) return;
+
+  await fetch("/api/chat/send", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      userId,
+      sender: "user",
+      message: text,
+      image
+    })
+  });
+
+  document.getElementById("msg").value = "";
+  fileInput.value = "";
+
+  loadHistory();
+}
+
+// AUTO REFRESH
+setInterval(loadHistory, 3000);
+loadHistory();
+</script>
+
+</body>
+</html>

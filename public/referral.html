@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agency</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#f3f4fa;
+}
+
+.app{
+  max-width:400px;
+  margin:auto;
+}
+
+/* HEADER */
+.header{
+  background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+  color:white;
+  padding:20px;
+  text-align:center;
+}
+
+.commission{
+  background:rgba(255,255,255,0.2);
+  padding:10px;
+  border-radius:20px;
+  margin-top:10px;
+  font-size:12px;
+}
+
+/* BOX */
+.box{
+  background:white;
+  margin:10px;
+  padding:15px;
+  border-radius:12px;
+}
+
+/* GRID */
+.grid{
+  display:flex;
+  justify-content:space-between;
+  text-align:center;
+}
+
+.grid div{
+  flex:1;
+}
+
+/* BTN */
+.btn{
+  margin-top:10px;
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  background:#ff6a6a;
+  color:white;
+}
+
+/* LIST */
+.menu{
+  background:white;
+  margin:10px;
+  border-radius:12px;
+}
+
+.menu-item{
+  padding:12px;
+  border-bottom:1px solid #eee;
+  display:flex;
+  justify-content:space-between;
+}
+
+/* SMALL */
+.small{
+  font-size:12px;
+  color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- HEADER -->
+<div class="header">
+  <h3>Agency</h3>
+
+  <h1 id="earn">0</h1>
+  <div class="commission">Yesterday's total commission</div>
+</div>
+
+<!-- STATS -->
+<div class="box">
+  <div class="grid">
+
+    <div>
+      <p>Register</p>
+      <h3 id="total">0</h3>
+    </div>
+
+    <div>
+      <p>Deposit number</p>
+      <h3 id="depositCount">0</h3>
+    </div>
+
+    <div>
+      <p>Deposit amount</p>
+      <h3 id="depositAmount">0</h3>
+    </div>
+
+  </div>
+
+  <button class="btn">Download QR Code</button>
+</div>
+
+<!-- REF LINK -->
+<div class="box">
+  <p>Copy invitation code</p>
+  <input id="refLink" readonly style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd">
+</div>
+
+<!-- MENU -->
+<div class="menu">
+  <div class="menu-item">Partner rewards <i class="fa fa-angle-right"></i></div>
+  <div class="menu-item">Subordinate data <i class="fa fa-angle-right"></i></div>
+  <div class="menu-item">Commission detail <i class="fa fa-angle-right"></i></div>
+  <div class="menu-item">Invitation rules <i class="fa fa-angle-right"></i></div>
+</div>
+
+</div>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+      <!-- NAVBAR -->
+<div class="bottom-nav">
+
+  <a href="home.html" class="nav-item">
+    <i class="fas fa-home"></i>
+    <p>Home</p>
+  </a>
+
+  <a href="activity.html" class="nav-item">
+    <i class="fas fa-chart-line"></i>
+    <p>Activity</p>
+  </a>
+
+  <a href="referral.html" class="nav-item">
+    <i class="fas fa-download"></i>
+    <p>Referral</p>
+  </a>
+
+  <a href="wallet.html" class="nav-item active">
+    <i class="fas fa-wallet"></i>
+    <p>Wallet</p>
+  </a>
+
+  <a href="account.html" class="nav-item">
+    <i class="fas fa-user"></i>
+    <p>Account</p>
+  </a>
+
+</div>
+      
+    
+</body>
+
+
+<script>
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+async function load(){
+
+  if(!user){
+    alert("Login first");
+    return;
+  }
+
+  const res = await fetch(`http://localhost:5000/api/referral/${user._id}`);
+  const data = await res.json();
+
+  console.log(data);
+
+  // referral link
+  const link = `${window.location.origin}/register.html?ref=${data.code}`;
+  document.getElementById("refLink").value = link;
+
+  // stats
+  document.getElementById("total").innerText = data.totalReferrals || 0;
+  document.getElementById("earn").innerText = data.earnings || 0;
+
+  // demo extra (optional)
+  document.getElementById("depositCount").innerText = data.totalReferrals || 0;
+  document.getElementById("depositAmount").innerText = data.earnings || 0;
+}
+
+load();
+
+</script>
+
+</body>
+</html>

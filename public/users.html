@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Users</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#f5f7fb;
+    }
+
+    .container{
+      padding:20px;
+    }
+
+    h2{
+      margin-bottom:15px;
+    }
+
+    .top-bar{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:15px;
+    }
+
+    .search{
+      display:flex;
+    }
+
+    .search input{
+      padding:8px;
+      border:1px solid #ccc;
+      border-radius:5px 0 0 5px;
+      outline:none;
+    }
+
+    .search button{
+      padding:8px 12px;
+      background:#5b5bff;
+      color:#fff;
+      border:none;
+      border-radius:0 5px 5px 0;
+      cursor:pointer;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    thead{
+      background:linear-gradient(45deg,#5b5bff,#7a5bff);
+      color:#fff;
+    }
+
+    th, td{
+      padding:12px;
+      text-align:left;
+      border-bottom:1px solid #eee;
+      font-size:14px;
+    }
+
+    tbody tr:hover{
+      background:#f9f9ff;
+    }
+
+    .btn{
+      padding:5px 10px;
+      border:1px solid #5b5bff;
+      color:#5b5bff;
+      border-radius:5px;
+      background:none;
+      cursor:pointer;
+    }
+
+    .btn:hover{
+      background:#5b5bff;
+      color:#fff;
+    }
+
+    .balance{
+      font-weight:bold;
+      color:#2196f3;
+    }
+
+    /* MODAL */
+    .modal{
+      display:none;
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.5);
+      z-index:999;
+    }
+
+    .modal-content{
+      background:#fff;
+      width:90%;
+      max-width:900px;
+      margin:40px auto;
+      padding:20px;
+      border-radius:10px;
+      position:relative;
+    }
+
+    .close{
+      position:absolute;
+      right:15px;
+      top:10px;
+      font-size:22px;
+      cursor:pointer;
+    }
+
+    .top-cards{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin-bottom:15px;
+    }
+
+    .card{
+      background:#f5f7fb;
+      padding:15px;
+      border-radius:10px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-bottom:15px;
+    }
+
+    .actions button{
+      flex:1;
+      padding:10px;
+      border:none;
+      color:#fff;
+      border-radius:8px;
+      cursor:pointer;
+    }
+
+    .green{background:#22c55e;}
+    .red{background:#ef4444;}
+    .blue{background:#4f46e5;}
+    .gray{background:#6b7280;}
+    .orange{background:#f97316;}
+
+    .info-box{
+      background:#f9fafb;
+      padding:15px;
+      border-radius:10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="top-bar">
+    <h2>All Users</h2>
+
+    <div class="search">
+      <input type="text" id="search" placeholder="Search phone...">
+      <button onclick="searchUser()">🔍</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Phone</th>
+        <th>Joined At</th>
+        <th>Balance</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody id="users"></tbody>
+  </table>
+
+</div>
+
+<!-- MODAL -->
+<div id="userModal" class="modal">
+  <div class="modal-content">
+
+    <span class="close" onclick="closeModal()">&times;</span>
+
+    <h2 id="modalName"></h2>
+
+    <div class="top-cards">
+      <div class="card">
+        <p>💎 Balance</p>
+        <h3 id="modalBalance"></h3>
+      </div>
+
+      <div class="card">
+        <p>🎮 Total Played</p>
+        <h3>৳0</h3>
+      </div>
+
+      <div class="card">
+        <p>🏆 Total Win</p>
+        <h3>৳0</h3>
+      </div>
+
+      <div class="card">
+        <p>💰 Total Profit</p>
+        <h3>৳0</h3>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="green" onclick="addBalance()">Balance</button>
+      <button class="red" onclick="minusBalance()">Balance</button>
+      <button class="blue" onclick="loginAsUser()">Logins</button>
+      <button class="gray" onclick="sendNotification()">Notifications</button>
+      <button id="banBtn" class="orange" onclick="banUser()">Ban User</button>
+    </div>
+
+    <div class="info-box">
+      <p><b>Name:</b> <span id="infoName"></span></p>
+      <p><b>Phone:</b> <span id="infoPhone"></span></p>
+      <p><b>Referral Code:</b> <span id="infoRef"></span></p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let allUsers = [];
+let currentUser = null;
+
+async function loadUsers(){
+  const res = await fetch("/api/admin/users");
+  const data = await res.json();
+
+  allUsers = data;
+  renderUsers(data);
+}
+
+function renderUsers(data){
+  let html = "";
+
+  data.forEach(user => {
+    html += `
+      <tr>
+        <td>${user.name || "No Name"}</td>
+        <td>${user.phone || "-"}</td>
+        <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "-"}</td>
+        <td class="balance">৳${user.balance || 0}</td>
+        <td>
+          <button onclick='openModal(${JSON.stringify(user)})' class="btn">
+            Details
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("users").innerHTML = html;
+}
+
+function searchUser(){
+  const value = document.getElementById("search").value.toLowerCase();
+
+  const filtered = allUsers.filter(user =>
+    (user.phone || "").toLowerCase().includes(value)
+  );
+
+  renderUsers(filtered);
+}
+
+// ================= MODAL =================
+function openModal(user){
+  currentUser = user;
+
+  document.getElementById("modalName").innerText =
+    "User Detail - " + (user.name || "No Name");
+
+  document.getElementById("modalBalance").innerText =
+    "৳" + (user.balance || 0);
+
+  document.getElementById("infoName").innerText = user.name || "No Name";
+  document.getElementById("infoPhone").innerText = user.phone || "-";
+  document.getElementById("infoRef").innerText = user.referralCode || "-";
+
+  // 🔥 BAN BUTTON TEXT FIX
+  const banBtn = document.getElementById("banBtn");
+  if(user.role === "banned"){
+    banBtn.innerText = "Unban User";
+  } else {
+    banBtn.innerText = "Ban User";
+  }
+
+  document.getElementById("userModal").style.display = "block";
+}
+
+function closeModal(){
+  document.getElementById("userModal").style.display = "none";
+}
+
+// ================= BALANCE =================
+async function addBalance(){
+  const amount = prompt("Add amount:");
+  if(!amount) return;
+
+  await fetch("/api/admin/update-balance", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      userId: currentUser._id,
+      amount,
+      type:"add"
+    })
+  });
+
+  alert("Balance Added");
+  location.reload();
+}
+
+async function minusBalance(){
+  const amount = prompt("Subtract amount:");
+  if(!amount) return;
+
+  await fetch("/api/admin/update-balance", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      userId: currentUser._id,
+      amount,
+      type:"minus"
+    })
+  });
+
+  alert("Balance Updated");
+  location.reload();
+}
+
+// ================= LOGIN FIX =================
+async function loginAsUser(){
+
+  // 🔥 get full user from server
+  const res = await fetch("/api/user/" + currentUser._id);
+  const user = await res.json();
+
+  // 🔥 SAVE FULL USER (IMPORTANT)
+  localStorage.setItem("user", JSON.stringify(user));
+  localStorage.setItem("userId", user._id);
+
+  window.open("account.html", "_blank");
+}
+
+// ================= NOTIFICATION FIX =================
+async function sendNotification(){
+  const msg = prompt("Enter message:");
+  if(!msg) return;
+
+  await fetch("/api/admin/notify", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      userId: currentUser._id,
+      message: msg
+    })
+  });
+
+  alert("Message Sent");
+}
+
+// ================= BAN FIX =================
+async function banUser(){
+  await fetch("/api/admin/ban", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      userId: currentUser._id
+    })
+  });
+
+  alert("Updated");
+  location.reload();
+}
+
+loadUsers();
+</script>
+
+</body>
+</html>

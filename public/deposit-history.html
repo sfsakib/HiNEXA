@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deposit History</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#dfe1ea; /* outer gray */
+  display:flex;
+  justify-content:center;
+}
+
+.app{
+  width:100%;
+  max-width:415px;
+  min-height:100vh;
+  background:#f5f7fb;
+}
+
+/* HEADER */
+.header{
+  background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+  position:sticky;
+  top:0;
+  color:#fff
+}
+
+.back{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:18px;
+  color:#fff;
+}
+
+/* FILTER */
+.filter{
+  display:flex;
+  gap:10px;
+  padding:10px;
+}
+
+.filter button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#eee;
+  cursor:pointer;
+}
+
+.filter .active{
+  background:#ff5b5b;
+  color:#fff;
+}
+
+/* CARD */
+.card{
+  background:#fff;
+  margin:10px;
+  padding:15px;
+  border-radius:12px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+}
+
+.tag{
+  background:#22c55e;
+  color:#fff;
+  padding:5px 10px;
+  border-radius:6px;
+}
+
+.status{
+  color:red;
+  font-weight:bold;
+}
+
+.info{
+  margin-top:10px;
+}
+
+.info p{
+  display:flex;
+  justify-content:space-between;
+  margin:5px 0;
+}
+
+.amount{
+  color:#ff7a00;
+}
+
+.btn{
+  margin-top:10px;
+  background:#ff5b5b;
+  color:#fff;
+  text-align:center;
+  padding:10px;
+  border-radius:20px;
+}
+</style>
+</head>
+
+<body>
+
+  <div class="app">
+
+<div class="header">
+    <i class="fas fa-arrow-left back" onclick="history.back()"></i>
+    Deposit history
+  </div>
+
+<div class="filter">
+  <button class="active" onclick="setFilter('all', this)">All</button>
+  <button onclick="setFilter('nagad', this)">Nagad</button>
+  <button onclick="setFilter('bkash', this)">bKash</button>
+  <button onclick="setFilter('usdt', this)">USDT</button>
+</div>
+
+<div id="history"></div>
+
+</div>
+
+<script>
+
+let allData = [];
+let currentFilter = "all";
+
+async function loadHistory(){
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if(!user){
+    alert("Login first");
+    location.href="login.html";
+    return;
+  }
+
+  const res = await fetch(`/api/user/history/${user._id}`);
+  const data = await res.json();
+
+  // 🔥 only deposit filter
+  allData = data.filter(t => t.type === "deposit");
+
+  render();
+}
+
+function setFilter(type, btn){
+
+  currentFilter = type;
+
+  document.querySelectorAll(".filter button").forEach(b=>{
+    b.classList.remove("active");
+  });
+
+  btn.classList.add("active");
+
+  render();
+}
+
+function render(){
+
+  let filtered = allData;
+
+  if(currentFilter !== "all"){
+    filtered = allData.filter(t =>
+      (t.method || "").toLowerCase().includes(currentFilter)
+    );
+  }
+
+  const box = document.getElementById("history");
+  box.innerHTML = "";
+
+  if(filtered.length === 0){
+    box.innerHTML = "<p style='text-align:center'>No data</p>";
+    return;
+  }
+
+  filtered.forEach(t => {
+
+    box.innerHTML += `
+      <div class="card">
+        <div class="top">
+          <div class="tag">Deposit</div>
+          <div class="status">${t.status}</div>
+        </div>
+
+        <div class="info">
+          <p><span>Balance</span><span class="amount">৳${t.amount}</span></p>
+          <p><span>Type</span><span>${t.method || "-"}</span></p>
+          <p><span>Time</span><span>${new Date(t.createdAt).toLocaleString()}</span></p>
+          <p><span>Transaction ID</span><span>${t.trxId || "-"}</span></p>
+        </div>
+
+        ${t.status === "rejected" ? `
+  <div class="btn" onclick="window.open('https://h5.workorder.support/', '_blank')">
+    Submit Receipt
+  </div>
+` : ""}
+      </div>
+    `;
+  });
+}
+
+loadHistory();
+
+</script>
+
+</body>
+</html>

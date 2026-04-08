@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Support Ticket</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    body{margin:0;font-family:Arial;background:#ece5dd}
+    .app{display:flex;height:100vh}
+    .sidebar{width:320px;background:#111b21;color:#fff;overflow:auto}
+    .sidebar h2{margin:0;padding:16px;background:#202c33}
+    .user{padding:14px 16px;border-bottom:1px solid #1f2c34;cursor:pointer}
+    .user:hover,.user.active{background:#202c33}
+    .online{color:#25d366;font-size:12px}
+    .offline{color:#9ca3af;font-size:12px}
+    .chat{flex:1;display:flex;flex-direction:column;background:#efeae2}
+    .chat-header{background:#202c33;color:#fff;padding:14px 16px}
+    .messages{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:10px}
+    .msg{max-width:60%;padding:10px 12px;border-radius:10px;position:relative;word-wrap:break-word}
+    .me{align-self:flex-end;background:#d9fdd3}
+    .other{align-self:flex-start;background:#fff}
+    .msg img{max-width:220px;border-radius:8px;display:block}
+    .time{font-size:11px;color:#666;margin-top:6px}
+    .input-area{display:flex;gap:8px;padding:10px;background:#202c33}
+    .input-area input[type="text"]{flex:1;padding:12px;border:none;border-radius:8px}
+    .input-area button,.file-label{padding:12px 14px;border:none;border-radius:8px;background:#25d366;color:#fff;cursor:pointer}
+    .file-label{display:inline-flex;align-items:center}
+    #file{display:none}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <h2>Support Ticket</h2>
+    <div id="userList"></div>
+  </div>
+
+  <div class="chat">
+    <div class="chat-header" id="chatHeader">Select a user</div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <label class="file-label" for="file">Image</label>
+      <input type="file" id="file" accept="image/*">
+      <input type="text" id="msg" placeholder="Type message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedUser = null;
+let usersCache = [];
+
+// 🔹 LOAD USERS
+async function loadUsers(){
+  const res = await fetch("/api/admin/users");
+  const data = await res.json();
+  usersCache = data;
+  renderUsers();
+}
+
+function renderUsers(){
+  const list = document.getElementById("userList");
+  list.innerHTML = usersCache.map(u => `
+    <div class="user ${selectedUser===u._id ? "active":""}" onclick="selectUser('${u._id}')">
+      <div>${u.name || "No Name"}</div>
+      <div>${u.phone || "-"}</div>
+    </div>
+  `).join("");
+}
+
+// 🔹 SELECT USER
+async function selectUser(id){
+  selectedUser = id;
+  renderUsers();
+
+  const u = usersCache.find(x => x._id === id);
+  document.getElementById("chatHeader").innerText =
+    (u?.name || "User") + " - " + (u?.phone || "");
+
+  loadHistory(id);
+}
+
+// 🔹 LOAD CHAT
+async function loadHistory(userId){
+  const res = await fetch("/api/chat/" + userId);
+  const data = await res.json();
+
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
+
+  data.forEach(m => {
+    const div = document.createElement("div");
+    div.className = "msg " + (m.sender === "admin" ? "me" : "other");
+
+    let html = "";
+    if(m.message) html += `<div>${m.message}</div>`;
+    if(m.image) html += `<img src="${m.image}">`;
+    html += `<div class="time">${new Date(m.createdAt).toLocaleString()}</div>`;
+
+    div.innerHTML = html;
+    box.appendChild(div);
+  });
+
+  box.scrollTop = box.scrollHeight;
+}
+
+// 🔹 SEND MESSAGE
+async function sendMessage(){
+  if(!selectedUser) return alert("Select user first");
+
+  const text = document.getElementById("msg").value.trim();
+  const fileInput = document.getElementById("file");
+  let image = "";
+
+  // upload image
+  if(fileInput.files[0]){
+    const fd = new FormData();
+    fd.append("image", fileInput.files[0]);
+
+    const uploadRes = await fetch("/api/chat/upload", {
+      method: "POST",
+      body: fd
+    });
+    const uploadData = await uploadRes.json();
+    image = uploadData.image;
+  }
+
+  if(!text && !image) return;
+
+  await fetch("/api/chat/send", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      userId: selectedUser,
+      sender: "admin",
+      message: text,
+      image
+    })
+  });
+
+  document.getElementById("msg").value = "";
+  fileInput.value = "";
+
+  loadHistory(selectedUser);
+}
+
+// 🔁 AUTO REFRESH
+setInterval(()=>{
+  if(selectedUser) loadHistory(selectedUser);
+},3000);
+
+loadUsers();
+</script>
+</body>
+</html>

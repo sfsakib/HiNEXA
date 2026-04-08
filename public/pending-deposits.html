@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pending Deposits</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#f5f7fb;
+    }
+
+    .container{
+      padding:20px;
+    }
+
+    h2{
+      margin-bottom:15px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    thead{
+      background:linear-gradient(45deg,#ef4444,#dc2626);
+      color:#fff;
+    }
+
+    th, td{
+      padding:12px;
+      text-align:left;
+      border-bottom:1px solid #eee;
+      font-size:14px;
+    }
+
+    tbody tr:hover{
+      background:#fff1f2;
+    }
+
+    .amount{
+      font-weight:bold;
+      color:#22c55e;
+    }
+
+    .btn{
+      padding:5px 10px;
+      border:none;
+      border-radius:5px;
+      cursor:pointer;
+      font-size:13px;
+      margin-right:5px;
+    }
+
+    .approve{
+      background:#22c55e;
+      color:#fff;
+    }
+
+    .reject{
+      background:#ef4444;
+      color:#fff;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Pending Deposits</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Phone</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody id="deposits"></tbody>
+  </table>
+
+</div>
+
+<script>
+async function loadDeposits(){
+  const res = await fetch("/api/admin/pending-deposits");
+  const data = await res.json();
+
+  let html = "";
+
+  if(data.length === 0){
+    html = "<tr><td colspan='5'>No Pending Deposits</td></tr>";
+  } else {
+    data.forEach(d => {
+      html += `
+        <tr>
+          <td>${d.userId?.name || "No Name"}</td>
+          <td>${d.userId?.phone || "-"}</td>
+          <td class="amount">৳${d.amount}</td>
+          <td>${d.method || "-"}</td>
+          <td>
+            <button class="btn approve" onclick="approve('${d._id}')">Approve</button>
+            <button class="btn reject" onclick="reject('${d._id}')">Reject</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  document.getElementById("deposits").innerHTML = html;
+}
+
+// APPROVE
+async function approve(id){
+  await fetch("/api/admin/approve-deposit", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ id })
+  });
+
+  alert("Approved");
+  loadDeposits();
+}
+
+// REJECT
+async function reject(id){
+  await fetch("/api/admin/reject-deposit", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ id })
+  });
+
+  alert("Rejected");
+  loadDeposits();
+}
+
+loadDeposits();
+</script>
+
+</body>
+</html>

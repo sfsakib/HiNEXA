@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Total Withdraw</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#f5f7fb;
+    }
+
+    .container{
+      padding:20px;
+    }
+
+    h2{
+      margin-bottom:15px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    thead{
+      background:linear-gradient(45deg,#3b82f6,#2563eb);
+      color:#fff;
+    }
+
+    th, td{
+      padding:12px;
+      border-bottom:1px solid #eee;
+      font-size:14px;
+    }
+
+    tbody tr:hover{
+      background:#eff6ff;
+    }
+
+    .amount{
+      font-weight:bold;
+      color:#ef4444;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Total Withdraw</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Phone</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+
+    <tbody id="data"></tbody>
+  </table>
+
+</div>
+
+<script>
+async function loadData(){
+  const res = await fetch("/api/admin/withdraws");
+  const data = await res.json();
+
+  let html = "";
+
+  if(data.length === 0){
+    html = "<tr><td colspan='5'>No Withdraws</td></tr>";
+  } else {
+    data.forEach(w => {
+      html += `
+        <tr>
+          <td>${w.userId?.name || "No Name"}</td>
+          <td>${w.userId?.phone || "-"}</td>
+          <td class="amount">৳${w.amount}</td>
+          <td>${w.method || "-"}</td>
+          <td>${w.createdAt ? new Date(w.createdAt).toLocaleString() : "-"}</td>
+        </tr>
+      `;
+    });
+  }
+
+  document.getElementById("data").innerHTML = html;
+}
+
+loadData();
+</script>
+
+</body>
+</html>

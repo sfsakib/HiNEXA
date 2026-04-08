@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pending Withdrawals</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#f5f7fb;
+    }
+
+    .container{
+      padding:20px;
+    }
+
+    h2{
+      margin-bottom:15px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    thead{
+      background:linear-gradient(45deg,#3b82f6,#2563eb);
+      color:#fff;
+    }
+
+    th, td{
+      padding:12px;
+      border-bottom:1px solid #eee;
+      font-size:14px;
+    }
+
+    tbody tr:hover{
+      background:#eff6ff;
+    }
+
+    .amount{
+      font-weight:bold;
+      color:#ef4444;
+    }
+
+    .btn{
+      padding:5px 10px;
+      border:none;
+      border-radius:5px;
+      cursor:pointer;
+      font-size:13px;
+      margin-right:5px;
+    }
+
+    .approve{
+      background:#22c55e;
+      color:#fff;
+    }
+
+    .reject{
+      background:#ef4444;
+      color:#fff;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Pending Withdrawals</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Phone</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody id="withdraws"></tbody>
+  </table>
+
+</div>
+
+<script>
+async function loadWithdraws(){
+  const res = await fetch("/api/admin/pending-withdrawals");
+  const data = await res.json();
+
+  let html = "";
+
+  if(data.length === 0){
+    html = "<tr><td colspan='5'>No Pending Withdrawals</td></tr>";
+  } else {
+    data.forEach(w => {
+      html += `
+        <tr>
+          <td>${w.userId?.name || "No Name"}</td>
+          <td>${w.userId?.phone || "-"}</td>
+          <td class="amount">৳${w.amount}</td>
+          <td>${w.method || "-"}</td>
+          <td>
+            <button class="btn approve" onclick="approve('${w._id}')">Approve</button>
+            <button class="btn reject" onclick="reject('${w._id}')">Reject</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  document.getElementById("withdraws").innerHTML = html;
+}
+
+// APPROVE
+async function approve(id){
+  await fetch("/api/admin/approve-withdraw", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ id })
+  });
+
+  alert("Withdraw Approved");
+  loadWithdraws();
+}
+
+// REJECT
+async function reject(id){
+  await fetch("/api/admin/reject-withdraw", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ id })
+  });
+
+  alert("Withdraw Rejected");
+  loadWithdraws();
+}
+
+loadWithdraws();
+</script>
+
+</body>
+</html>

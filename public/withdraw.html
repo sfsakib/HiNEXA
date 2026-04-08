@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Withdraw</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#dfe1ea;}
+
+.app{max-width:415px;margin:auto;background:#f5f6fb;min-height:100vh;}
+
+.header{
+  background:#fff;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:bold;
+  color:#333;
+}
+
+.balance{
+  margin:12px;
+  background:linear-gradient(135deg,#ff6a6a,#ff8a8a);
+  border-radius:15px;
+  padding:18px;
+  color:#fff;
+  position:relative;
+  overflow:hidden;
+}
+
+.balance h2{
+  font-size:26px;
+  margin-top:5px;
+}
+
+.balance::after{
+  content:"";
+  position:absolute;
+  right:-40px;
+  top:-40px;
+  width:150px;
+  height:150px;
+  background:rgba(255,255,255,0.1);
+  border-radius:50%;
+}
+
+.methods{
+  display:flex;
+  gap:10px;
+  padding:12px;
+}
+
+.method{
+  flex:1;
+  padding:15px 10px;
+  text-align:center;
+  border-radius:12px;
+  background:#fff;
+  cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+.method.active{
+  background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+  color:#fff;
+}
+
+.card{
+  background:#fff;margin:12px;border-radius:12px;padding:12px;
+}
+
+.input-box{
+  background:#f3f4f6;
+  padding:12px;
+  border-radius:12px;
+  margin-top:10px;
+}
+
+.input-box input,
+.input-box select{
+  width:100%;
+  border:none;
+  background:transparent;
+  outline:none;
+  font-size:14px;
+}
+
+.btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:25px;
+  background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+  color:#fff;
+  font-weight:bold;
+  margin-top:10px;
+}
+
+.error{color:red;font-size:12px;margin-top:5px;}
+
+.info{font-size:12px;color:#666;line-height:1.6;}
+
+/* 🔥 POPUP */
+.popup{
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+.popup-box{
+  background:#fff;
+  padding:25px;
+  border-radius:15px;
+  text-align:center;
+  width:90%;
+  max-width:300px;
+}
+.popup-box h2{color:#ff7a00;margin-bottom:10px;}
+.popup-btn{
+  background:#ff7a00;
+  color:#fff;
+  border:none;
+  padding:10px 20px;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="header">
+  <i class="fas fa-arrow-left" onclick="history.back()"></i>
+  <div>Withdraw</div>
+  <span onclick="window.location.href='withdraw-history.html'" 
+      style="font-size:14px;color:#ff5b5b;cursor:pointer;font-weight:500;">
+  History
+</span>
+</div>
+
+<div class="balance">
+  <p>Available balance</p>
+  <h2 id="balance">৳0.00</h2>
+</div>
+
+<div class="methods">
+  <div class="method active" onclick="setMethod('wallet',this)">E-Wallet</div>
+  <div class="method" onclick="setMethod('usdt',this)">USDT</div>
+</div>
+
+<div class="card" id="formArea"></div>
+
+<div class="card">
+  <button class="btn" onclick="submitWithdraw()">Withdraw</button>
+</div>
+
+<div class="card info" id="infoBox"></div>
+
+</div>
+
+<!-- 🔥 POPUP -->
+<div id="successPopup" class="popup">
+  <div class="popup-box">
+    <h2>Thank You!</h2>
+    <p>The money will be added to the account within 24 hours.</p>
+    <br>
+    <button class="popup-btn" onclick="goHistory()">PROCEED</button>
+  </div>
+</div>
+
+<script>
+
+let current = "wallet";
+
+function getUser(){
+  return JSON.parse(localStorage.getItem("user"));
+}
+
+async function loadBalance(){
+  const user = getUser();
+  if(!user) return;
+
+  const res = await fetch(`/api/wallet/${user._id}`);
+  const data = await res.json();
+  document.getElementById("balance").innerText = "৳" + data.balance.toFixed(2);
+}
+
+function loadForm(){
+  const box = document.getElementById("formArea");
+
+  if(current === "wallet"){
+    box.innerHTML = `
+      <div class="input-box">
+        <select id="type">
+          <option>bKash</option>
+          <option>Nagad</option>
+          <option>Rocket</option>
+        </select>
+      </div>
+      <div class="input-box">
+        <input id="number" placeholder="Wallet Number">
+      </div>
+      <div class="input-box">
+        <input id="amount" placeholder="Enter amount">
+      </div>
+      <div class="error" id="error"></div>
+    `;
+  }
+
+  if(current === "usdt"){
+    box.innerHTML = `
+      <div class="input-box">
+        <input id="address" placeholder="USDT Wallet Address">
+      </div>
+      <div class="input-box">
+        <input id="amount" placeholder="Enter amount">
+      </div>
+      <div class="error" id="error"></div>
+    `;
+  }
+
+  loadInfo();
+}
+
+function loadInfo(){
+  const info = document.getElementById("infoBox");
+
+  if(current === "wallet"){
+    info.innerHTML = `
+      ♦ Minimum withdraw ৳100<br>
+      ♦ Withdraw time 00:00-23:50<br>
+      ♦ Max ৳25,000<br>
+    `;
+  } else {
+    info.innerHTML = `
+      ♦ Minimum withdraw ৳1270<br>
+      ♦ Network confirmation required<br>
+      ♦ Max ৳10,00,000<br>
+    `;
+  }
+}
+
+function setMethod(type,el){
+  current = type;
+  document.querySelectorAll(".method").forEach(m=>m.classList.remove("active"));
+  el.classList.add("active");
+  loadForm();
+}
+
+// 🔥 POPUP FUNCTIONS
+function showPopup(){
+  document.getElementById("successPopup").style.display = "flex";
+}
+function goHistory(){
+  window.location.href = "withdraw-history.html";
+}
+
+// ===== SUBMIT =====
+async function submitWithdraw(){
+
+  const amount = parseFloat(document.getElementById("amount").value);
+  const error = document.getElementById("error");
+
+  if(!amount){
+    error.innerText = "Enter amount";
+    return;
+  }
+
+  const balance = parseFloat(document.getElementById("balance").innerText.replace("৳",""));
+
+  if(amount > balance){
+    error.innerText = "Insufficient balance";
+    return;
+  }
+
+  const user = getUser();
+
+  let bodyData = {
+    userId: user._id,
+    amount,
+    method: current
+  };
+
+  if(current === "wallet"){
+    bodyData.number = document.getElementById("number").value;
+    bodyData.accountType = document.getElementById("type").value;
+  } else {
+    bodyData.address = document.getElementById("address").value;
+  }
+
+  const res = await fetch("/api/withdraw-request", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify(bodyData)
+  });
+
+  if(res.ok){
+    showPopup(); // 🔥 popup show
+    document.getElementById("amount").value = "";
+    loadBalance();
+  }
+}
+
+loadBalance();
+loadForm();
+
+</script>
+
+</body>
+</html>

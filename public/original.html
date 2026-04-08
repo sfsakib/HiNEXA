@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aviator Page</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+        }
+
+        .banner {
+            background: linear-gradient(45deg, #ff0000, #000);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+        }
+
+        .btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            font-size: 18px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="banner">
+    Aviator Demo Game 🚀
+</div>
+
+<button class="btn" onclick="openGame()">Play Now</button>
+
+<iframe id="gameFrame"></iframe>
+
+<script>
+function openGame() {
+
+    var link = "https://aviator-demo.spribegaming.com/?currency=USD&operator=demo&jurisdiction=CW&lang=EN&return_url=https%3A%2F%2Fspribe.co%2Fgames&user=71721&token=xgzdxckD7o1SH1jvSa4iUqxfT8TMs1bD";
+
+    // Try iframe first
+    document.getElementById("gameFrame").src = link;
+
+    // fallback (if blocked)
+    setTimeout(function(){
+        if(document.getElementById("gameFrame").contentWindow.length === 0){
+            window.open(link, "_blank");
+        }
+    }, 2000);
+}
+</script>
+
+</body>
+</html>

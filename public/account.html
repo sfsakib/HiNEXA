@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.account-header{
+  background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+  padding:20px 15px 60px;
+  display:flex;
+  gap:12px;
+  color:#fff;
+  border-bottom-left-radius:25px;
+  border-bottom-right-radius:25px;
+}
+
+.avatar{
+  width:65px;
+  height:65px;
+  border-radius:50%;
+  border:3px solid #fff;
+}
+
+.user-info h2{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.uid-box{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:#ffa726;
+  padding:4px 10px;
+  border-radius:15px;
+  font-size:12px;
+  color:#fff;
+  margin-top:5px;
+}
+
+.balance-card{
+  background:#fff;
+  margin:-40px 12px 10px;
+  padding:15px;
+  border-radius:20px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.08);
+}
+
+.balance-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.balance-row i{
+  color:#888;
+}
+
+.balance-actions{
+  display:flex;
+  justify-content:space-around;
+  margin-top:15px;
+}
+
+.ba-item{
+  text-align:center;
+  text-decoration:none;
+  color:#333;
+  font-size:13px;
+}
+
+.ba-item i{
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+  margin:auto;
+  margin-bottom:5px;
+}
+
+.red{background:#ffe5e5;color:#ff5b5b;}
+.orange{background:#fff3e0;color:#ff9800;}
+.blue{background:#e3f2fd;color:#2196f3;}
+.green{background:#e8f5e9;color:#4caf50;}
+
+.safe-box{
+  background:#fff;
+  margin:12px;
+  padding:12px;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.safe-mid p{
+  font-size:12px;
+  color:#666;
+}
+
+.grid-menu{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:12px;
+}
+
+.grid-item{
+  background:#fff;
+  border-radius:15px;
+  padding:15px;
+  text-decoration:none;
+  color:#333;
+}
+
+.grid-item i{
+  font-size:20px;
+  margin-bottom:5px;
+}
+
+.service-center{
+  background:#fff;
+  margin:12px;
+  padding:15px;
+  border-radius:15px;
+}
+
+.service-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.service-grid a{
+  text-decoration:none;
+  color:#333;
+  font-size:13px;
+}
+
+.logout-btn{
+  margin:20px 12px;
+  padding:14px;
+  border:1px solid #ff5b5b;
+  border-radius:25px;
+  text-align:center;
+  color:#ff5b5b;
+  font-weight:bold;
+}
+
+.top-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.last-login{
+  font-size:13px;
+  margin-top:5px;
+  color:#fff;
+  opacity:0.9;
+}
+
+.safe-left i{
+  width:35px;
+  height:35px;
+  background:#fff3e0;
+  color:#ff9800;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+}
+
+.grid-item i{
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+  margin-bottom:8px;
+  font-size:18px;
+}
+
+/* 🎮 Game */
+.grid-item:nth-child(1) i{
+  background:#e3f2fd;
+  color:#2196f3;
+}
+
+/* 📄 Transaction */
+.grid-item:nth-child(2) i{
+  background:#e8f5e9;
+  color:#4caf50;
+}
+
+/* 📥 Deposit */
+.grid-item:nth-child(3) i{
+  background:#fff3e0;
+  color:#ff9800;
+}
+
+/* 📤 Withdraw */
+.grid-item:nth-child(4) i{
+  background:#fce4ec;
+  color:#e91e63;
+}
+
+.service-center{
+  background:#fff;
+  margin:12px;
+  padding:18px;
+  border-radius:18px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.06);
+}
+
+.service-center h4{
+  margin-bottom:12px;
+  font-size:16px;
+}
+
+.service-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:12px;
+}
+
+.service-grid a{
+  background:#f5f7fb;
+  border-radius:12px;
+  padding:10px;
+  text-align:center;
+  text-decoration:none;
+  color:#333;
+  font-size:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+}
+
+.service-grid i{
+  width:35px;
+  height:35px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  background:#e3f2fd;
+  color:#2196f3;
+}
+
+.bottom-nav{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:415px;
+  background:#fff;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.nav-item{
+  text-align:center;
+  font-size:11px;
+  color:#777;
+}
+
+.nav-item i{
+  font-size:18px;
+  margin-bottom:3px;
+}
+
+.nav-item.active{
+  color:#ff5b5b;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="account-header">
+
+  
+  <img id="avatar" src="" class="avatar">
+
+  <div class="user-info">
+  <h2 id="name">User</h2>
+
+  <div class="top-row">
+    <button onclick="editName()">Edit</button>
+
+    <div class="uid-box" onclick="copyUID()">
+      <span id="uid">UID</span>
+      <i class="fas fa-copy"></i>
+      <span id="refCode"></span>
+    </div>
+  </div>
+
+  <!-- 👇 DATE নিচে -->
+  <div class="last-login" id="lastLogin">--</div>
+</div>
+
+</div>
+
+
+<!-- BALANCE CARD -->
+<div class="balance-card">
+
+  <p>Total balance</p>
+
+  <div class="balance-row">
+    <h2 id="balance">৳0.00</h2>
+    <i class="fas fa-sync"></i>
+  </div>
+
+  <div class="balance-actions">
+
+  <a href="wallet.html" class="ba-item">
+    <i class="fas fa-wallet red"></i>
+    <p>Wallet</p>
+  </a>
+
+  <a href="deposit.html" class="ba-item">
+    <i class="fas fa-download orange"></i>
+    <p>Deposit</p>
+  </a>
+
+  <a href="withdraw.html" class="ba-item">
+    <i class="fas fa-upload blue"></i>
+    <p>Withdraw</p>
+  </a>
+
+  <a href="vip.html" class="ba-item">
+    <i class="fas fa-gem green"></i>
+    <p>VIP</p>
+  </a>
+
+</div>
+
+</div>
+
+<!-- SAFE BOX -->
+<div class="safe-box">
+
+  <div class="safe-left">
+    <i class="fas fa-shield-alt"></i>
+  </div>
+
+  <div class="safe-mid">
+    <h4>Safe</h4>
+    <p>Half-hour interest rate 0.0%, earnings calculated once every 30 minutes</p>
+  </div>
+
+  <div class="safe-right">৳0.00</div>
+
+</div>
+
+<div class="grid-menu">
+
+  <a href="game-history.html" class="grid-item">
+    <i class="fas fa-gamepad"></i>
+    <h4>Game History</h4>
+    <p>My game history</p>
+  </a>
+
+  <a href="transaction.html" class="grid-item">
+    <i class="fas fa-file-invoice"></i>
+    <h4>Transaction</h4>
+    <p>My transaction history</p>
+  </a>
+
+  <a href="deposit-history.html" class="grid-item">
+    <i class="fas fa-download"></i>
+    <h4>Deposit</h4>
+    <p>My deposit history</p>
+  </a>
+
+  <a href="withdraw-history.html" class="grid-item">
+    <i class="fas fa-upload"></i>
+    <h4>Withdraw</h4>
+    <p>My withdraw history</p>
+  </a>
+
+</div>
+
+  <!-- SERVICE -->
+  <div class="service-center">
+  <h4>Service center</h4>
+
+  <div class="service-grid">
+
+  <a href="announcement.html"><i class="fas fa-bullhorn"></i><span>Announcement</span></a>
+  <a href="settings.html"><i class="fas fa-gear"></i><span>Settings</span></a>
+  <a href="feedback.html"><i class="fas fa-comment-dots"></i><span>Feedback</span></a>
+
+  <a href="support.html"><i class="fas fa-headset"></i><span>Customer Service</span></a>
+  <a href="about.html"><i class="fas fa-circle-info"></i><span>About us</span></a>
+  <a href="guide.html"><i class="fas fa-book"></i><span>Beginner's Guide</span></a>
+
+
+</div>
+</div>
+
+<div class="logout-btn" onclick="logout()">Log out</div>
+
+</div>
+
+<!-- NAVBAR -->
+<div class="bottom-nav">
+
+  <a href="home.html" class="nav-item">
+    <i class="fas fa-home"></i>
+    <p>Home</p>
+  </a>
+
+  <a href="activity.html" class="nav-item">
+    <i class="fas fa-chart-line"></i>
+    <p>Activity</p>
+  </a>
+
+  <a href="referral.html" class="nav-item">
+    <i class="fas fa-download"></i>
+    <p>Referral</p>
+  </a>
+
+  <a href="wallet.html" class="nav-item">
+    <i class="fas fa-wallet"></i>
+    <p>Wallet</p>
+  </a>
+
+  <a href="account.html" class="nav-item active">
+    <i class="fas fa-user"></i>
+    <p>Account</p>
+  </a>
+
+</div>
+
+<script>
+if(!localStorage.getItem("token")){
+  window.location.href = "login.html";
+}
+
+// 🔥 LOAD USER (ONE FUNCTION ONLY)
+async function loadUser(){
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const res = await fetch(`/api/user/${user._id}`);
+  const data = await res.json();
+
+  // ✅ NAME
+  document.getElementById("name").innerText = data.name || "User";
+
+  document.getElementById("avatar").src = data.avatar || "https://i.pravatar.cc/100";
+
+  // ✅ UID
+  document.getElementById("uid").innerText = data._id.slice(-6);
+
+  // ✅ BALANCE
+  document.getElementById("balance").innerText = "৳" + data.balance.toFixed(2);
+
+  // ✅ LAST LOGIN
+  if(data.lastLogin){
+    const date = new Date(data.lastLogin);
+    document.getElementById("lastLogin").innerText =
+      date.toLocaleDateString() + " " + date.toLocaleTimeString();
+  } else {
+    document.getElementById("lastLogin").innerText = "First Login";
+  }
+
+  // ✅ SAVE latest
+  localStorage.setItem("user", JSON.stringify(data));
+}
+
+// 🔥 EDIT NAME
+async function editName(){
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const newName = prompt("Enter new name");
+
+  if(!newName) return;
+
+  await fetch("/api/update-name", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      id: user._id,
+      name: newName
+    })
+  });
+
+  alert("Name updated");
+
+  loadUser(); // refresh
+}
+
+// 🔥 LOGOUT
+function logout(){
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.href = "login.html";
+}
+
+// LOAD ON START
+loadUser();
+</script>
+
+<script>function copyUID(){
+  const uid = document.getElementById("uid").innerText;
+
+  navigator.clipboard.writeText(uid)
+    .then(()=>{
+      alert("UID copied: " + uid);
+    })
+    .catch(()=>{
+      alert("Copy failed");
+    });
+}</script>
+
+<script>
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+async function loadUser(){
+
+  const res = await fetch(`/api/user/${user._id}`);
+  const data = await res.json();
+
+  // name
+  document.getElementById("name").innerText = data.name;
+
+  // UID (short)
+  document.getElementById("uid").innerText = data._id.slice(-6);
+
+  // 🔥 referral code show
+  document.getElementById("refCode").innerText = data.referralCode;
+}
+
+loadUser();
+</script>
+
+<script>
+  async function checkNotification(){
+  const userId = localStorage.getItem("userId");
+
+  const res = await fetch("/api/user/" + userId);
+  const user = await res.json();
+
+  if(user.notification){
+    alert(user.notification);
+
+    // clear after show
+    await fetch("/api/admin/notify", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        userId,
+        message: ""
+      })
+    });
+  }
+}
+
+checkNotification();
+</script>
+
+</body>
+</html>

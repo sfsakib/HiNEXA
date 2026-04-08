@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Transactions</title>
+</head>
+
+<body>
+
+<h2>Transactions</h2>
+
+<div id="list"></div>
+
+<script>
+
+async function loadData(){
+
+  const res = await fetch("http://localhost:5000/api/admin/transactions");
+  const data = await res.json();
+
+  const box = document.getElementById("list");
+  box.innerHTML = "";
+
+  data.forEach(t => {
+
+    const div = document.createElement("div");
+    div.style.border = "1px solid #ccc";
+    div.style.padding = "10px";
+    div.style.margin = "10px";
+
+    div.innerHTML = `
+      <p><b>User:</b> ${t.userId?.phone || "Unknown"}</p>
+      <p><b>Type:</b> ${t.type}</p>
+      <p><b>Amount:</b> ৳${t.amount}</p>
+      <p><b>Method:</b> ${t.method || "N/A"}</p>
+      <p><b>Transaction ID:</b> ${t.trxId || "N/A"}</p>
+      <p><b>Details:</b> ${t.note || "N/A"}</p>
+      <p><b>Status:</b> ${t.status}</p>
+
+      ${t.status === "pending" ? `
+        <button onclick="approve('${t._id}')">Approve</button>
+        <button onclick="reject('${t._id}')">Reject</button>
+      ` : ""}
+    `;
+
+    box.appendChild(div);
+  });
+
+}
+
+async function approve(id){
+  await fetch("http://localhost:5000/api/admin/approve", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ id })
+  });
+
+  loadData();
+}
+
+async function reject(id){
+  await fetch("http://localhost:5000/api/admin/reject", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ id })
+  });
+
+  loadData();
+}
+
+loadData();
+
+</script>
+
+</body>
+</html>

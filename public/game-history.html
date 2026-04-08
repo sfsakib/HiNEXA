@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game History</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#dfe1ea; /* outer gray */
+  display:flex;
+  justify-content:center;
+}
+
+.app{
+  width:100%;
+  max-width:415px;
+  min-height:100vh;
+  background:#f5f7fb;
+}
+
+/* HEADER */
+.header{
+  position:sticky;
+  top:0;
+  background:linear-gradient(180deg,#ff6a6a,#ff8a8a);
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+  font-size:18px;
+  color:#fff
+}
+.back{
+  position:absolute;
+  left:15px;
+}
+
+/* CATEGORY */
+.categories{
+  display:flex;
+  gap:12px;
+  padding:10px;
+  overflow-x:auto;
+}
+.cat{
+  min-width:80px;
+  padding:10px;
+  text-align:center;
+  border-radius:12px;
+  background:#f1f1f1;
+  font-size:14px;
+  cursor:pointer;
+}
+.cat.active{
+  background:linear-gradient(45deg,#ff5b5b,#ff7a7a);
+  color:#fff;
+}
+
+/* FILTER */
+.filter{
+  display:flex;
+  gap:10px;
+  padding:10px;
+}
+.filter div{
+  background:#fff;
+  padding:12px;
+  border-radius:10px;
+  flex:1;
+  cursor:pointer;
+}
+
+/* EMPTY */
+.empty{
+  text-align:center;
+  margin-top:100px;
+  color:#aaa;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  bottom:-100%;
+  left:0;
+  right:0;
+  background:#fff;
+  border-radius:20px 20px 0 0;
+  padding:15px;
+  transition:0.3s;
+}
+.modal.show{
+  bottom:0;
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.item{
+  background:#f1f1f1;
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  cursor:pointer;
+}
+.item.active{
+  background:linear-gradient(45deg,#ff5b5b,#ff7a7a);
+  color:#fff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+    <div class="header">
+    <i class="fas fa-arrow-left back" onclick="history.back()"></i>
+    Game history
+  </div>
+
+<!-- CATEGORY -->
+<div class="categories">
+  <div class="cat active" onclick="setCategory(this,'lottery')">Lottery</div>
+  <div class="cat" onclick="setCategory(this,'casino')">Casino</div>
+  <div class="cat" onclick="setCategory(this,'fishing')">Fishing</div>
+  <div class="cat" onclick="setCategory(this,'rummy')">Rummy</div>
+  <div class="cat" onclick="setCategory(this,'slots')">Slots</div>
+</div>
+
+<!-- FILTER -->
+<div class="filter">
+  <div onclick="openModal()" id="gameFilter">All ▼</div>
+  <div onclick="openDate()" id="dateBox">
+    <span id="dateText">Choose date ▼</span>
+    <input type="date" id="dateInput">
+  </div>
+</div>
+
+<!-- EMPTY -->
+<div class="empty">
+  <p>No data</p>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="grid" id="grid"></div>
+</div>
+
+
+<script>
+
+// ===== SUB CATEGORY DATA =====
+const data = {
+  lottery: ["All","Win Go","Trx Win Go","5D","K3"],
+  casino: ["All","Blackjack","Roulette","Baccarat"],
+  fishing: ["All","Fish Hunter","Ocean King"],
+  rummy: ["All","Rummy Classic","Rummy Pro"],
+  slots: ["All","PG Slots","Jili Slots","Pragmatic"]
+};
+
+let currentCategory = "lottery";
+
+// ===== LOAD SUB CATEGORY =====
+function loadSubCategory(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
+  data[currentCategory].forEach((item,index)=>{
+    const div = document.createElement("div");
+    div.className = "item " + (index==0 ? "active":"");
+    div.innerText = item;
+    div.onclick = function(){
+      selectItem(this);
+    };
+    grid.appendChild(div);
+  });
+
+  document.getElementById("gameFilter").innerText = "All ▼";
+}
+
+// ===== CATEGORY CHANGE =====
+function setCategory(el, type){
+  currentCategory = type;
+
+  document.querySelectorAll(".cat").forEach(c=>{
+    c.classList.remove("active");
+  });
+  el.classList.add("active");
+
+  loadSubCategory();
+}
+
+// ===== MODAL OPEN =====
+function openModal(){
+  document.getElementById("modal").classList.add("show");
+}
+
+// ===== SELECT ITEM =====
+function selectItem(el){
+  document.querySelectorAll(".item").forEach(i=>{
+    i.classList.remove("active");
+  });
+
+  el.classList.add("active");
+
+  document.getElementById("gameFilter").innerText = el.innerText + " ▼";
+  document.getElementById("modal").classList.remove("show");
+}
+
+// ===== DATE FIX =====
+function openDate(){
+  document.getElementById("dateInput").click();
+}
+
+document.getElementById("dateInput").addEventListener("change", function(){
+  document.getElementById("dateText").innerText = this.value;
+});
+
+// ===== CLOSE MODAL CLICK OUTSIDE =====
+document.addEventListener("click", function(e){
+  const modal = document.getElementById("modal");
+  if(!modal.contains(e.target) && !e.target.closest("#gameFilter")){
+    modal.classList.remove("show");
+  }
+});
+
+// INITIAL LOAD
+loadSubCategory();
+
+</script>
+
+</body>
+</html>
