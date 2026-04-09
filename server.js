@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // DB CONNECT
-mongoose.connect("mongodb://127.0.0.1:27017/hignice_clone")
+mongoose.connect("mongodb+srv://sfsakib:Sakib890@hinexa.lxxnesn.mongodb.net/hignice_clone")
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
 
